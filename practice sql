@@ -1,0 +1,59 @@
+CREATE TABLE dogs (
+    name VARCHAR(50),
+    breed VARCHAR(50),
+    age INT
+);
+
+DESC cats;
+
+INSERT INTO cats (name, age)
+VALUES ('Jenkins', 7);
+
+--- # Add another cat:
+INSERT INTO cats (name, age)
+VALUES ('Blue Steele', 5);
+
+SELECT * FROM cats;
+
+INSERT INTO cats(age, name) 
+VALUES (2, "Beth");
+
+--- # Multiple Insert
+INSERT INTO cats(name, age)
+VALUES ('Charlie, 10)
+       ,('Sadie', 3)
+       ,('Lazy Bear', 1);
+
+--- # Single Insert
+INSERT INTO cats (age, name)
+VALUES (2, 'Beth');
+
+--- # Create People Table
+CREATE TABLE people(
+  first_name VARCHAR(20),
+  last_name VARCHAR(20),
+  age INT
+
+INSERT INTO people(first_name, last_name, age)
+VALUES ('Tina', 'Belcher', 13);
+
+INSERT INTO people(first_name, last_name, age)
+VALUES ('Bob', 'Belcher', 42);
+
+INSERT INTO people (first_name, last_name, age)
+VALUES ('Linda', 'Belcher', 45),
+      ('Philip', 'Frond', 38),
+      ('Calvin', 'Fichoeder', 70);
+
+--- # Set default values
+CREATE TABLE cats3
+  (
+  name varchar(100) 
+  default 'unnamed',
+  age INT DEFAULT 99
+);
+
+
+
+
+
