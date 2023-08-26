@@ -1,0 +1,156 @@
+---- # USER SCHEMA
+
+DROP DATABASE ig_clone;
+CREATE DATABASE ig_clone;
+USE ig_clone;
+
+CREATE TABLE users (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO users (username) VALUES
+('BlueTheCat'),
+('CharlieBrown'),
+('ColtSteele');
+
+---- # PHOTOS SCHEMA
+
+CREATE TABLE photos (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    image_url VARCHAR(255) NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+INSERT INTO users (username) VALUES
+('BlueTheCat'),
+('CharlieBrown'),
+('ColtSteele');
+
+INSERT INTO photos (image_url, user_id) VALUES
+('/alskjd76', 1),
+('/fsdfggd8', 2),
+('/fdsofih8', 2);
+
+---- # COMMENTS SCHEMA
+
+CREATE TABLE comments (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    comment_text VARCHAR(255) NOT NULL,
+    user_id INTEGER NOT NULL,
+    photo_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(photo_id) REFERENCES photos(id)
+);
+
+---- # LIKES SCHEMA
+
+CREATE TABLE likes (
+    user_id INTEGER NOT NULL,
+    photo_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(photo_id) REFERENCES photos(id),
+    PRIMARY KEY(user_id, photo_id)
+)
+
+---- # FOLLOWERS SCHEMA
+
+CREATE TABLE follows (
+    follower_id INTEGER NOT NULL,
+    followee_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (follower_id) REFERENCES users(id),
+    FOREIGN KEY (followee_id) REFERENCES users(id),
+    PRIMARY KEY (follower_id, followee_id)
+);
+
+---- # IMPLEMENTING HASHTAGS TABLE
+
+CREATE TABLE photo_tags (
+    photo_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    FOREIGN KEY(photo_id) REFERENCES photos(id),
+    FOREIGN KEY(tag_id) REFERENCES tags(id),
+    PRIMARY KEY(photo_id, tag_id)
+);
+
+---- # INSTAGRAM CHALLENGE 1
+    -- finding 5 oldest users
+
+SELECT *
+FROM users
+ORDER BY created_at
+LIMIT 5;
+
+---- # INSTAGRAM CHALLENGE 2
+    -- most popular registration date
+
+SELECT  
+    DAYNAME(created_at) AS day,
+    COUNT * AS total
+FROM users
+GROUP BY day
+ORDER BY total DESC;
+
+---- # INSTAGRAM CHALLENGE 3
+    -- Identify inactive users (users with no photos)
+
+SELECT username, image_url
+FROM users
+LEFT JOIN photos
+    ON users.id = photos.user_id
+WHERE photos.id IS NULL;
+
+---- # INSTAGRAM CHALLENGE 4
+    -- Identify the most popular photo (and the user who created it)
+
+SELECT 
+    username,
+    photos.id, 
+    photos.image_url, 
+    COUNT *
+FROM photos
+INNER JOIN likes
+    ON likes.photo_id = photos.id
+INNER JOIN users
+    ON photos.user_id = users.id
+GROUP BY photos.id
+ORDER BY total DESC
+LIMIT 1;
+
+---- # INSTAGRAM CHALLENGE 5
+    -- Calculate avg number of photos per user
+    -- Total number of photos / total number of users
+    
+SELECT 
+    (SELECT COUNT() FROM photos) / (SELECT COUNT() FROM users) AS avg;
+
+---- # INSTAGRAM CHALLENGE 6
+    -- 5 Most popular hashtags
+
+SELECT 
+    tags.tag_name,,
+    COUNT * as total
+FROM photo_tags
+JOIN tags
+    ON photo_tags.tag_id = tags.id
+GROUP BY tags.id
+ORDER BY total DESC
+LIMIT 5;
+
+---- # INSTAGRAM CHALLENGE 7
+    -- Finding Bots - users who have liked every single photo
+
+SELECT 
+    username,
+    COUNT * AS num_likes
+FROM users
+INNER JOIN likes
+    ON users.id = likes.user_id
+GROUP BY likes.user_id
+HAVING num_likes = (SELECT COUNT(*) FROM photos);
